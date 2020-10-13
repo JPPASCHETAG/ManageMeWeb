@@ -21,6 +21,10 @@ if (mysqli_connect_errno())
         case 1:
             $sql = "SELECT * FROM USER WHERE EMAIL ='".$_GET["MAIL"]."' AND PASSWORD='".$_GET["PASSWORT"]."'";
             break;
+        //Kontenrundruf
+        case 2:
+            Core_finance::MAKE_KONTENRUNDRUF();
+            break;
     }
 }
 // Confirm there are results
