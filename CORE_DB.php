@@ -4,13 +4,16 @@ class CORE_DB{
     private $mysql;
     private $sql = "";
     private $CONNECTION_STATUS = 1;
-    /*
-     * 0 Select
-     * 1 Insert/Update
-     */
     private $SQL_ART = 0;
     const USER_ID = "5f79aeaa55946";
 
+    /**
+     * CORE_DB constructor.
+     * Mode O: select
+     * Mode 1: insert/update
+     *
+     * @param $SQL_ART
+     */
     public function __construct($SQL_ART){
         $this->SQL_ART = $SQL_ART;
         $this->mysql = new mysqli("localhost","root","","accounts");
@@ -18,6 +21,8 @@ class CORE_DB{
         {
             $this->CONNECTION_STATUS = -1;
         }
+        //@TODO USER_ID sezen
+
     }
 
     public function setSQL($strSQL){

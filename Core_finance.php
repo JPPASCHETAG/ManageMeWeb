@@ -1,4 +1,5 @@
 <?php
+include "CORE_DB.php";
 require 'HBCI/vendor/autoload.php';
 use Fhp\FinTs;
 use Fhp\Model\StatementOfAccount\Statement;
@@ -60,10 +61,20 @@ class Core_finance{
         $oDB = new CORE_DB(1);
         $oDB->setSQL($strGesamtSQL);
         $arrResult = $oDB->RUN_SQL();
-        var_dump($arrResult);
 
+        return $arrResult;
     }
 
+    public static function RETURN_KONTO_UMSATZE(){
+
+        $strSQL = "SELECT * FROM KONTO_".CORE_DB::USER_ID ." ORDER BY DATE DESC";
+
+        $oDB = new CORE_DB(0);
+        $oDB->setSQL($strSQL);
+        $arrResult = $oDB->RUN_SQL();
+
+        return $arrResult;
+    }
 
 
 

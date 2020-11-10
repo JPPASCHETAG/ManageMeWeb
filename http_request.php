@@ -1,16 +1,10 @@
 <?php
-include ("postExecute.php");
-$mysqli = new mysqli("localhost","root","","accounts");
+include "Core_finance.php";
 
 $mode = $_GET["MODE"];
 $sql = "";
+$arrReturn = array();
 
-// Check connection
-if (mysqli_connect_errno())
-{
-    echo "Failed to connect to MySQL: " . mysqli_connect_error();
-    return;
-}else {
     switch ($mode) {
 
         //Registrierung
@@ -23,40 +17,17 @@ if (mysqli_connect_errno())
             break;
         //Kontenrundruf
         case 2:
-            Core_finance::MAKE_KONTENRUNDRUF();
+            $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF();
+
+            if($arrRundruf["STATUSCODE"] == 1){
+                $arrReturn = Core_finance::RETURN_KONTO_UMSATZE();
+            }else{
+                $arrReturn["STATUSCODE"] = -1;
+                $arrReturn["STATUS"] = "Fehler beim Kontorundruf";
+            }
+
             break;
     }
-}
-// Confirm there are results
-$arrReturn = Array();
-$rows = 0;
-
-if ($mysqli->multi_query($sql))
-{
-    do {
-        /* store first result set */
-        if ($result = $mysqli->store_result()) {
-
-            while ($row = $result->fetch_assoc()) {
-                array_push($arrReturn,$row);
-            }
-            $rows .= $result->num_rows;
-            $result->free();
-        }
-
-    } while ($mysqli->next_result());
-
-    //Auch wenn kein ergebnis zurückgegeben wird den error zurückgeben
-    if($rows > 0){
-        $arrReturn = POST_EECUTE::appendSuccessData($arrReturn,$mode);
-    }else{
-        $arrReturn = POST_EECUTE::appendErrorData($arrReturn,$mode);
-    }
-}else{
-    $arrReturn = POST_EECUTE::appendErrorData($arrReturn,$mode);
-    $arrReturn["ERROR_CODE"] = $mysqli->errno;
-
-}
 
 echo json_encode($arrReturn);
 

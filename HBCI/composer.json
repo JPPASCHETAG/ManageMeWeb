@@ -1,6 +1,7 @@
 {
     "require": {
         "mschindler83/fints-hbci-php": "^1.0",
-        "ext-mysqli": "*"
+        "ext-mysqli": "*",
+      "ext-json": "*"
     }
 }
