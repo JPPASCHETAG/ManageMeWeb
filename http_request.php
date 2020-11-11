@@ -1,5 +1,6 @@
 <?php
 include "Core_finance.php";
+include "CORE_ANMELDUNG.php";
 
 $mode = $_GET["MODE"];
 $sql = "";
@@ -9,11 +10,11 @@ $arrReturn = array();
 
         //Registrierung
         case 0:
-            $sql = "INSERT INTO USER (VORNAME,NACHNAME,PASSWORD,EMAIL,USER_KENNUNG) VALUES ('".$_GET["VORNAME"]."','".$_GET["NACHNAME"]."','".$_GET["PASSWORT"]."','".$_GET["MAIL"]."','".uniqid()."')";
+            $arrReturn = CORE_ANMELDUNG::REGISTRIERUNG();
             break;
         //Login
         case 1:
-            $sql = "SELECT * FROM USER WHERE EMAIL ='".$_GET["MAIL"]."' AND PASSWORD='".$_GET["PASSWORT"]."'";
+            $arrReturn = CORE_ANMELDUNG::MAKE_LOGIN();
             break;
         //Kontenrundruf
         case 2:

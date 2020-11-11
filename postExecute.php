@@ -1,6 +1,6 @@
 <?php
 
-class POST_EECUTE{
+class POST_EXECUTE{
 
     public static function appendSuccessData($arrReturn,$mode){
 
