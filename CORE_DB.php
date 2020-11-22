@@ -16,7 +16,7 @@ class CORE_DB{
      */
     public function __construct($SQL_ART){
         $this->SQL_ART = $SQL_ART;
-        $this->mysql = new mysqli("localhost","root","","accounts");
+        $this->mysql = new mysqli("localhost","root","","manage_me");
         if (mysqli_connect_errno())
         {
             $this->CONNECTION_STATUS = -1;
