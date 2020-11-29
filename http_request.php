@@ -18,15 +18,20 @@ $arrReturn = array();
             break;
         //Kontenrundruf
         case 2:
-            $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF();
+            //$date = Core_finance::getLastRundruf();
+            $date = $_GET["LAST_RUNDRUF"];
+            if($date == ""){
+                $date = date("Y-m-d");
+            }
+
+            $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF($date);
 
             if($arrRundruf["STATUSCODE"] == 1){
-                $arrReturn = Core_finance::RETURN_KONTO_UMSATZE();
+                $arrReturn = Core_finance::RETURN_KONTO_UMSATZE($date);
             }else{
                 $arrReturn["STATUSCODE"] = -1;
                 $arrReturn["STATUS"] = "Fehler beim Kontorundruf";
             }
-
             break;
     }
 

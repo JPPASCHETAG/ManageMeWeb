@@ -7,7 +7,9 @@ use Fhp\Model\StatementOfAccount\Transaction;
 
 class Core_finance{
 
-    public static function getKontoUmsaetze(){
+    public static function getKontoUmsaetze($date){
+
+        //TODO die Daten müssem aus der App übergeben werden
 
         define('FHP_BANK_URL', 'https://fints.ing.de/fints');                # HBCI / FinTS Url can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm (use the PIN/TAN URL)
         define('FHP_BANK_PORT', 443);              # HBCI / FinTS Port can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm
@@ -19,9 +21,11 @@ class Core_finance{
 
         $accounts = $fints->getSEPAAccounts();
 
+        //TODO hier muss eigentlich dynamisch das richtige Konto gewählt werden
+
         $oneAccount = $accounts[1];
-        //@todo: hier muss das letze datum eines Rundrufs geholt werden
-        $from = new DateTime('2020-09-10');
+
+        $from = new DateTime($date);
         $to   = new DateTime();
         $soa = $fints->getStatementOfAccount($oneAccount, $from, $to);
 
@@ -44,17 +48,17 @@ class Core_finance{
         return $arrStatements;
     }
 
-    public static function MAKE_KONTENRUNDRUF(){
+    public static function MAKE_KONTENRUNDRUF($date){
 
         $strGesamtSQL = "";
 
         //die Kontoumsätze holen
-        $arrKonto = self::getKontoUmsaetze();
+        $arrKonto = self::getKontoUmsaetze($date);
 
         foreach ($arrKonto as $umsatz){
 
             $ValutaDate = date_format($umsatz["DATE"],"Y-m-d");
-            $strEinzelSQL = "INSERT INTO KONTO_".CORE_DB::USER_ID ."(BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
+            $strEinzelSQL = "INSERT INTO KONTO_KENNUNG (BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
             $strGesamtSQL .= $strEinzelSQL;
         }
 
@@ -65,9 +69,9 @@ class Core_finance{
         return $arrResult;
     }
 
-    public static function RETURN_KONTO_UMSATZE(){
+    public static function RETURN_KONTO_UMSATZE($date){
 
-        $strSQL = "SELECT * FROM KONTO_".CORE_DB::USER_ID ." ORDER BY DATE DESC";
+        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >=".$date." ORDER BY DATE DESC ";
 
         $oDB = new CORE_DB(0);
         $oDB->setSQL($strSQL);
@@ -76,6 +80,23 @@ class Core_finance{
         return $arrResult;
     }
 
+    public static function getLastRundruf(){
+
+        $strSQL = "SELECT DATE FROM KONTO_KENNUNG ORDER BY DATE DESC LIMIT 1";
+
+        $oDB = new CORE_DB(0);
+        $oDB->setSQL($strSQL);
+        $arrResult = $oDB->RUN_SQL();
+
+        if(isset($arrResult[0]["DATE"])){
+            $strReturn = $arrResult[0]["DATE"];
+        }else{
+            $strReturn = date("Y-m-d",strtotime(' -90 days'));
+        }
+
+        return $strReturn;
+
+    }
 
 
 }
