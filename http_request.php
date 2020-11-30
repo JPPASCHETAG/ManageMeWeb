@@ -18,10 +18,13 @@ $arrReturn = array();
             break;
         //Kontenrundruf
         case 2:
-            //$date = Core_finance::getLastRundruf();
-            $date = $_GET["LAST_RUNDRUF"];
+            $date = "";
+            if(!isset($_GET["LAST_RUNDRUF"])){
+                $date = @$_GET["LAST_RUNDRUF"];
+            }
             if($date == ""){
-                $date = date("Y-m-d");
+                $date = new DateTime('-90 days');
+                $date = $date->format('Y-m-d');
             }
 
             $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF($date);

@@ -71,7 +71,7 @@ class Core_finance{
 
     public static function RETURN_KONTO_UMSATZE($date){
 
-        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >=".$date." ORDER BY DATE DESC ";
+        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >='".$date."' ORDER BY DATE DESC ";
 
         $oDB = new CORE_DB(0);
         $oDB->setSQL($strSQL);
