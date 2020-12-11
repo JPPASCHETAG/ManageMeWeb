@@ -50,7 +50,7 @@ class Core_finance{
         return $arrStatements;
     }
 
-    public static function MAKE_KONTENRUNDRUF($date,$HBCI_Nutzer,$HbCI_Pw){
+    public static function MAKE_KONTENRUNDRUF($date,$HBCI_Nutzer,$HbCI_Pw,$userKennung){
 
         $strGesamtSQL = "";
 
@@ -61,7 +61,7 @@ class Core_finance{
 
             $ValutaDate = date_format($umsatz["DATE"],"Y-m-d");
             if($ValutaDate > $date){
-                $strEinzelSQL = "INSERT INTO KONTO_KENNUNG (BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
+                $strEinzelSQL = "INSERT INTO KONTO_".$userKennung." (BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
                 $strGesamtSQL .= $strEinzelSQL;
             }
         }
@@ -79,9 +79,9 @@ class Core_finance{
         return $arrResult;
     }
 
-    public static function RETURN_KONTO_UMSATZE($date){
+    public static function RETURN_KONTO_UMSATZE($date,$userKennung){
 
-        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >'".$date."' ORDER BY DATE DESC ";
+        $strSQL = "SELECT * FROM KONTO_".$userKennung." WHERE DATE >'".$date."' ORDER BY DATE DESC ";
 
         $oDB = new CORE_DB(0);
         $oDB->setSQL($strSQL);
@@ -89,24 +89,4 @@ class Core_finance{
 
         return $arrResult;
     }
-
-    public static function getLastRundruf(){
-
-        $strSQL = "SELECT DATE FROM KONTO_KENNUNG ORDER BY DATE DESC LIMIT 1";
-
-        $oDB = new CORE_DB(0);
-        $oDB->setSQL($strSQL);
-        $arrResult = $oDB->RUN_SQL();
-
-        if(isset($arrResult[0]["DATE"])){
-            $strReturn = $arrResult[0]["DATE"];
-        }else{
-            $strReturn = date("Y-m-d",strtotime(' -90 days'));
-        }
-
-        return $strReturn;
-
-    }
-
-
 }

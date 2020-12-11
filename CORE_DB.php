@@ -5,7 +5,6 @@ class CORE_DB{
     private $sql = "";
     private $CONNECTION_STATUS = 1;
     private $SQL_ART = 0;
-    const USER_ID = "5f79aeaa55946";
 
     /**
      * CORE_DB constructor.
@@ -17,12 +16,9 @@ class CORE_DB{
     public function __construct($SQL_ART){
         $this->SQL_ART = $SQL_ART;
         $this->mysql = new mysqli("localhost","root","","manage_me");
-        if (mysqli_connect_errno())
-        {
+        if (mysqli_connect_errno()){
             $this->CONNECTION_STATUS = -1;
         }
-        //@TODO USER_ID sezen
-
     }
 
     public function setSQL($strSQL){
