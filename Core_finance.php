@@ -7,15 +7,17 @@ use Fhp\Model\StatementOfAccount\Transaction;
 
 class Core_finance{
 
-    public static function getKontoUmsaetze($date){
+    public static function getKontoUmsaetze($date,$HBCI_Nutzer,$HbCI_Pw){
 
         //TODO die Daten müssem aus der App übergeben werden
 
         define('FHP_BANK_URL', 'https://fints.ing.de/fints');                # HBCI / FinTS Url can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm (use the PIN/TAN URL)
         define('FHP_BANK_PORT', 443);              # HBCI / FinTS Port can be found here: https://www.hbci-zka.de/institute/institut_auswahl.htm
         define('FHP_BANK_CODE', '50010517');               # Your bank code / Bankleitzahl
-        define('FHP_ONLINE_BANKING_USERNAME', '5418251008'); # Your online banking username / alias
-        define('FHP_ONLINE_BANKING_PIN', '54431073');      # Your online banking PIN (NOT! the pin of your bank card!)
+        //define('FHP_ONLINE_BANKING_USERNAME', '5418251008'); # Your online banking username / alias
+        define('FHP_ONLINE_BANKING_USERNAME', $HBCI_Nutzer); # Your online banking username / alias
+        //define('FHP_ONLINE_BANKING_PIN', '54431073');      # Your online banking PIN (NOT! the pin of your bank card!)
+        define('FHP_ONLINE_BANKING_PIN', $HbCI_Pw);      # Your online banking PIN (NOT! the pin of your bank card!)
 
         $fints = new FinTs(FHP_BANK_URL,FHP_BANK_PORT,FHP_BANK_CODE,FHP_ONLINE_BANKING_USERNAME,FHP_ONLINE_BANKING_PIN);
 
@@ -48,30 +50,38 @@ class Core_finance{
         return $arrStatements;
     }
 
-    public static function MAKE_KONTENRUNDRUF($date){
+    public static function MAKE_KONTENRUNDRUF($date,$HBCI_Nutzer,$HbCI_Pw){
 
         $strGesamtSQL = "";
 
         //die Kontoumsätze holen
-        $arrKonto = self::getKontoUmsaetze($date);
+        $arrKonto = self::getKontoUmsaetze($date,$HBCI_Nutzer,$HbCI_Pw);
 
         foreach ($arrKonto as $umsatz){
 
             $ValutaDate = date_format($umsatz["DATE"],"Y-m-d");
-            $strEinzelSQL = "INSERT INTO KONTO_KENNUNG (BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
-            $strGesamtSQL .= $strEinzelSQL;
+            if($ValutaDate > $date){
+                $strEinzelSQL = "INSERT INTO KONTO_KENNUNG (BETRAG,VZWECK,ART,NAME,DATE,CREDIT_DEBIT,IS_SORTED) VALUES (".$umsatz["AMOUNT"].",'".$umsatz["VWZ"]."','".$umsatz["ART"]."','".$umsatz["NAME"]."','".$ValutaDate."','".$umsatz["CREDIT_DEBIT"]."',0);";
+                $strGesamtSQL .= $strEinzelSQL;
+            }
         }
 
-        $oDB = new CORE_DB(1);
-        $oDB->setSQL($strGesamtSQL);
-        $arrResult = $oDB->RUN_SQL();
+        if($strGesamtSQL != ""){
+            $oDB = new CORE_DB(1);
+            $oDB->setSQL($strGesamtSQL);
+            $arrResult = $oDB->RUN_SQL();
+        }else{
+            $arrResult = array();
+            $arrResult["STATUSCODE"] = 1;
+        }
+
 
         return $arrResult;
     }
 
     public static function RETURN_KONTO_UMSATZE($date){
 
-        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >='".$date."' ORDER BY DATE DESC ";
+        $strSQL = "SELECT * FROM KONTO_KENNUNG WHERE DATE >'".$date."' ORDER BY DATE DESC ";
 
         $oDB = new CORE_DB(0);
         $oDB->setSQL($strSQL);

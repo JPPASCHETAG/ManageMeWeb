@@ -19,18 +19,25 @@ $arrReturn = array();
         //Kontenrundruf
         case 2:
             $date = "";
-            if(!isset($_GET["LAST_RUNDRUF"])){
+            if(isset($_GET["LAST_RUNDRUF"])){
                 $date = @$_GET["LAST_RUNDRUF"];
             }
             if($date == ""){
                 $date = new DateTime('-90 days');
                 $date = $date->format('Y-m-d');
             }
+            if(isset($_GET["ONLINE_BANKING_NUTZER"]) && isset($_GET["ONLINE_BANKING_PWD"])) {
+                $HBCI_Nutzer = $_GET["ONLINE_BANKING_NUTZER"];
+                $HbCI_Pw = $_GET["ONLINE_BANKING_PWD"];
 
-            $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF($date);
+                $arrRundruf = Core_finance::MAKE_KONTENRUNDRUF($date,$HBCI_Nutzer,$HbCI_Pw);
 
-            if($arrRundruf["STATUSCODE"] == 1){
-                $arrReturn = Core_finance::RETURN_KONTO_UMSATZE($date);
+                if ($arrRundruf["STATUSCODE"] == 1) {
+                    $arrReturn = Core_finance::RETURN_KONTO_UMSATZE($date);
+                } else {
+                    $arrReturn["STATUSCODE"] = -1;
+                    $arrReturn["STATUS"] = "Fehler beim Kontorundruf";
+                }
             }else{
                 $arrReturn["STATUSCODE"] = -1;
                 $arrReturn["STATUS"] = "Fehler beim Kontorundruf";

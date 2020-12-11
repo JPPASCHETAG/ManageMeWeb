@@ -9,6 +9,8 @@ class POST_EXECUTE{
                 $arrReturn["REGISTER_SUCCESS"] = true;
                 $arrReturn["MAIL"] = $_GET["MAIL"];
                 $arrReturn["PASSWORT"] = $_GET["PASSWORT"];
+                $arrReturn["NACHNAME"] = $_GET["NACHNAME"];
+                $arrReturn["VORNAME"] = $_GET["VORNAME"];
                 break;
             case 1:
                 $arrReturn["LOGIN_SUCCESS"] = true;
